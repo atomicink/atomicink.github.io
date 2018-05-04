@@ -1,0 +1,190 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>NonatomicInk</title>
+  
+  <subtitle>格纳库</subtitle>
+  <link href="/atom.xml" rel="self"/>
+  
+  <link href="http://atomicink.github.io/"/>
+  <updated>2018-05-04T07:01:22.472Z</updated>
+  <id>http://atomicink.github.io/</id>
+  
+  <author>
+    <name>atomicink</name>
+    
+  </author>
+  
+  <generator uri="http://hexo.io/">Hexo</generator>
+  
+  <entry>
+    <title>精简Mumu模拟器的占用空间</title>
+    <link href="http://atomicink.github.io/2018/05/04/%E7%B2%BE%E7%AE%80Mumu%E6%A8%A1%E6%8B%9F%E5%99%A8%E7%9A%84%E5%8D%A0%E7%94%A8%E7%A9%BA%E9%97%B4/"/>
+    <id>http://atomicink.github.io/2018/05/04/精简Mumu模拟器的占用空间/</id>
+    <published>2018-05-04T05:58:52.000Z</published>
+    <updated>2018-05-04T07:01:22.472Z</updated>
+    
+    <content type="html"><![CDATA[<p>mac版Mumu模拟器长期使用后占用空间已达9.3G，而模拟器内实际使用空间仅为2G。为节省存储空间，可使用Vmware的vdiskmanager来精简空间。</p><ol><li><p>置零可用空间</p><p>在模拟器内运行<a href="https://apkpure.com/cn/secure-eraser/com.aiuspaktyn.secureeraser" target="_blank" rel="noopener">Secure Eraser</a>，模式设为Zero Fill(0000-0000)</p></li><li><p>精简虚拟磁盘</p><p>使用<a href="https://kb.vmware.com/s/article/1023856" target="_blank" rel="noopener">vmware-vdiskmanager</a>，命令如下：</p><p>vmware-vdiskmanager -k data.vmdk</p></li></ol><p><a href="https://kb.vmware.com/s/article/2101443?other.KM_Utility.getArticleLanguage=1&amp;r=1&amp;other.KM_Utility.getArticleData=1&amp;other.KM_Utility.getArticle=1&amp;ui-comm-runtime-components-aura-components-siteforce-qb.Quarterback.validateRoute=1&amp;other.KM_Utility.getGUser=1" target="_blank" rel="noopener">精简原理</a></p><blockquote></blockquote><p>可精简虚拟磁盘，以便它们仅占用与 .vmdk中存在的数据一样多的空间。</p><blockquote></blockquote><p>如果精简后的虚拟磁盘使用的空间仍比其内操作系统报告的空间多，则仍需要将卷中的旧数据置零或移除。</p><blockquote></blockquote><p>在大多数文件系统中删除文件都不会完全移除它们；仅仅会更改文件表。使用免费软件安全文件删除实用程序是非常有用的，例如，可以使用 Eraser 或 SDelete 将空间置零以便将卷上的可用空间置零，从而有效地清除可用数据空间。这样，便可以正确地精简磁盘。然后，可以使用vmkfstools -K命令（ESXi/ESX 4.1 及更高版本）完成块回收，或者使用 Storage vMotion 将虚拟机迁移到具有不同 VMFS 块大小的数据存储。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;mac版Mumu模拟器长期使用后占用空间已达9.3G，而模拟器内实际使用空间仅为2G。为节省存储空间，可使用Vmware的vdiskmanager来精简空间。&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;&lt;p&gt;置零可用空间&lt;/p&gt;
+&lt;p&gt;在模拟器内运行&lt;a href=&quot;https://apk
+      
+    
+    </summary>
+    
+    
+      <category term="杂集" scheme="http://atomicink.github.io/tags/%E6%9D%82%E9%9B%86/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>UITextView限制字数</title>
+    <link href="http://atomicink.github.io/2015/12/15/UITextView%E9%99%90%E5%88%B6%E5%AD%97%E6%95%B0/"/>
+    <id>http://atomicink.github.io/2015/12/15/UITextView限制字数/</id>
+    <published>2015-12-15T14:11:37.000Z</published>
+    <updated>2015-12-15T15:56:54.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>一开始认为UITextView限制字数很简单，在delegate里处理一下shouldChangeTextInRange就行了：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">//const NSInteger kMaxLength = 100;</span><br><span class="line">- (BOOL)textView:(UITextView *)textView shouldChangeTextInRange:(NSRange)range replacementText:(NSString *)text &#123;</span><br><span class="line">    return textView.text.length + text.length - range.length &lt;= kMaxLength;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>没想到在使用拼音输入法的联想功能时并不触发这个方法。只好在textViewDidChange里强行限制了：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br></pre></td><td class="code"><pre><span class="line">- (void)textViewDidChange:(UITextView *)textView &#123;</span><br><span class="line">    if(textView.text.length &gt; kMaxLength) &#123;</span><br><span class="line">        textView.text = [textView.text substringToIndex:kMaxLength];</span><br><span class="line">    &#125;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;一开始认为UITextView限制字数很简单，在delegate里处理一下shouldChangeTextInRange就行了：&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;
+      
+    
+    </summary>
+    
+    
+      <category term="iOS" scheme="http://atomicink.github.io/tags/iOS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>命令行打包ipa</title>
+    <link href="http://atomicink.github.io/2015/10/31/%E5%91%BD%E4%BB%A4%E8%A1%8C%E6%89%93%E5%8C%85ipa/"/>
+    <id>http://atomicink.github.io/2015/10/31/命令行打包ipa/</id>
+    <published>2015-10-31T00:36:47.000Z</published>
+    <updated>2015-10-31T04:27:34.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>入职新公司，公司的自动打包环境最近出问题了，只好手动打包，命令如下：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">xcodebuild -scheme scheme名 -sdk iphoneos -configuration AppStoreDistribution archive -archivePath $PWD/build/app名.xcarchive</span><br><span class="line"></span><br><span class="line">xcodebuild -exportArchive -archivePath $PWD/build/app名.xcarchive -exportPath $PWD/build -exportProvisioningProfile &quot;Provisioning名&quot;</span><br></pre></td></tr></table></figure><p>注意：以前流行的xcrun PackageApplication现在是无法使用的。</p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;入职新公司，公司的自动打包环境最近出问题了，只好手动打包，命令如下：&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;&lt;span class=&quot;line&quot;&gt;1&lt;/span&gt;&lt;br&gt;
+      
+    
+    </summary>
+    
+    
+      <category term="iOS" scheme="http://atomicink.github.io/tags/iOS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>使用 hexo 搭建博客</title>
+    <link href="http://atomicink.github.io/2015/06/07/%E4%BD%BF%E7%94%A8hexo%E6%90%AD%E5%BB%BA%E5%8D%9A%E5%AE%A2/"/>
+    <id>http://atomicink.github.io/2015/06/07/使用hexo搭建博客/</id>
+    <published>2015-06-07T02:00:00.000Z</published>
+    <updated>2018-05-04T07:00:19.848Z</updated>
+    
+    <content type="html"><![CDATA[<p>简单地记录一下本站建设过程</p><p>#配置 hexo</p><ol><li>安装 <a href="https://nodejs.org" target="_blank" rel="noopener">node.js</a></li><li>使用<a href="http://npm.taobao.org" target="_blank" rel="noopener">淘宝镜像</a>加速</li><li><p>安装 hexo </p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//hexo－cli</span></span><br><span class="line">sudo cnpm install -g hexo-cli</span><br><span class="line"><span class="comment">//rss 生成</span></span><br><span class="line">sudo cnpm install hexo-generator-feed --save</span><br><span class="line"><span class="comment">//git 生成插件</span></span><br><span class="line">sudo cnpm install hexo-deployer-git --save</span><br></pre></td></tr></table></figure></li></ol><p>#配置 git</p><ol><li>配置 ssh 公钥</li><li>在 github 或 gitcafe 建立 pages</li></ol><p>#建立博客</p><ol><li><p>初始化</p><figure class="highlight c"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line"><span class="comment">//以 Blog 文件夹为例</span></span><br><span class="line">hexo init Blog</span><br><span class="line">cd Blog</span><br><span class="line">cnpm install</span><br></pre></td></tr></table></figure></li><li><p><a href="http://hexo.io/zh-cn/docs/configuration.html" target="_blank" rel="noopener">配置 _config.yml</a></p></li><li>设置主题，我用的是 <a href="https://github.com/iissnan/hexo-theme-next" target="_blank" rel="noopener">NexT</a></li><li>设置<a href="http://duoshuo.com" target="_blank" rel="noopener">多说</a></li><li>生成静态文件 <code>hexo g</code></li><li>本地服务器调试  <code>hexo s</code></li><li>发布 <code>hexo d</code></li></ol><p>#写博客</p><ol><li>新建文章 <code>hexo n &quot;文章标题&quot;</code></li><li>使用 markdown 编辑器写作</li><li>生成发布  <code>hexo d -g</code></li></ol><p>#个人域名</p><ol><li>购买域名，namecheap 或 godaddy</li><li>设置 github 的 CNAME，或 gitcafe 的 pages</li><li>dnspod 绑定</li></ol><p>#可选优化</p><ol><li>多说速度不稳定，使用<a href="https://portal.qiniu.com/signup?code=3ldifkny84bbm" target="_blank" rel="noopener">七牛云存储</a>做镜像来提速</li><li>使用 dnspod 分流国内外流量</li><li>优化字体加载</li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;简单地记录一下本站建设过程&lt;/p&gt;
+&lt;p&gt;#配置 hexo&lt;/p&gt;
+&lt;ol&gt;
+&lt;li&gt;安装 &lt;a href=&quot;https://nodejs.org&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;node.js&lt;/a&gt;&lt;/li&gt;
+&lt;li&gt;使用&lt;a href=
+      
+    
+    </summary>
+    
+    
+      <category term="杂集" scheme="http://atomicink.github.io/tags/%E6%9D%82%E9%9B%86/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>学习资料</title>
+    <link href="http://atomicink.github.io/2015/06/05/%E5%AD%A6%E4%B9%A0%E8%B5%84%E6%96%99/"/>
+    <id>http://atomicink.github.io/2015/06/05/学习资料/</id>
+    <published>2015-06-05T03:50:26.000Z</published>
+    <updated>2018-05-04T07:00:14.427Z</updated>
+    
+    <content type="html"><![CDATA[<p><a href="https://www.gitbook.com/book/numbbbbb/-the-swift-programming-language-/details" target="_blank" rel="noopener">The Swift Programming Language 中文版</a></p><p><a href="https://www.gitbook.com/book/zsisme/ios-/details" target="_blank" rel="noopener">ios核心动画高级技巧</a></p><p><a href="https://www.gitbook.com/book/kaisery/rust-book-chinese/details" target="_blank" rel="noopener">rust book 中文翻译</a></p><p><a href="http://www.liaoxuefeng.com/wiki/0014316089557264a6b348958f449949df42a6d3a2e542c000" target="_blank" rel="noopener">Python 3 教程</a></p><p><a href="http://dev.swiftguide.cn/" target="_blank" rel="noopener">Swift 语言指南</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;&lt;a href=&quot;https://www.gitbook.com/book/numbbbbb/-the-swift-programming-language-/details&quot; target=&quot;_blank&quot; rel=&quot;noopener&quot;&gt;The Swift Program
+      
+    
+    </summary>
+    
+    
+      <category term="杂集" scheme="http://atomicink.github.io/tags/%E6%9D%82%E9%9B%86/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>NSOrderedSet的崩溃问题</title>
+    <link href="http://atomicink.github.io/2015/03/13/NSOrderedSet%E7%9A%84%E5%B4%A9%E6%BA%83%E9%97%AE%E9%A2%98/"/>
+    <id>http://atomicink.github.io/2015/03/13/NSOrderedSet的崩溃问题/</id>
+    <published>2015-03-13T02:53:00.000Z</published>
+    <updated>2015-06-05T04:57:58.000Z</updated>
+    
+    <content type="html"><![CDATA[<p>最近把项目里CoreDataModel的一个一对多的关系改为有序的，对象的class因此从NSSet变为NSOrderedSet。</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br></pre></td><td class="code"><pre><span class="line">@property (nonatomic, retain) NSOrderedSet *myFlowDetail;</span><br><span class="line"></span><br><span class="line">- (void)addMyFlowDetailObject:(MyFlowDetailEntity *)value;</span><br></pre></td></tr></table></figure><p>使用中却发现向NSOrderedSet里添加对象时会崩溃，经查询发现似乎是一个Apple从2011年到现在都没解决的bug。</p><p>临时解决方法是给这个类添加一个category覆盖上述方法：</p><figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">- (void)addMyFlowDetailObject:(MyFlowDetailEntity *)value</span><br><span class="line">&#123;</span><br><span class="line">    NSMutableOrderedSet *flowDetail = [[NSMutableOrderedSet alloc] initWithOrderedSet:self.myFlowDetail];</span><br><span class="line">    [flowDetail addObject:value];</span><br><span class="line">    self.myFlowDetail = flowDetail;</span><br><span class="line">&#125;</span><br></pre></td></tr></table></figure><p>参考：<a href="http://stackoverflow.com/questions/7385439/exception-thrown-in-nsorderedset-generated-accessors" target="_blank" rel="noopener">Exception thrown in NSOrderedSet generated accessors</a></p>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;p&gt;最近把项目里CoreDataModel的一个一对多的关系改为有序的，对象的class因此从NSSet变为NSOrderedSet。&lt;/p&gt;
+&lt;figure class=&quot;highlight plain&quot;&gt;&lt;table&gt;&lt;tr&gt;&lt;td class=&quot;gutter&quot;&gt;&lt;pre&gt;
+      
+    
+    </summary>
+    
+    
+      <category term="iOS" scheme="http://atomicink.github.io/tags/iOS/"/>
+    
+  </entry>
+  
+  <entry>
+    <title>Windows下编译WPA Supplicant</title>
+    <link href="http://atomicink.github.io/2013/06/15/Windows%E4%B8%8B%E7%BC%96%E8%AF%91WPA-Supplicant/"/>
+    <id>http://atomicink.github.io/2013/06/15/Windows下编译WPA-Supplicant/</id>
+    <published>2013-06-15T09:30:17.000Z</published>
+    <updated>2015-06-06T08:16:22.000Z</updated>
+    
+    <content type="html"><![CDATA[<h3 id="下载WinPcap"><a href="#下载WinPcap" class="headerlink" title="下载WinPcap"></a>下载WinPcap</h3><p>下载<code>WpdPack_4_0_2.zip</code>，解压到<code>C:\dev\WpdPack</code>。</p><h3 id="编译OpenSSL"><a href="#编译OpenSSL" class="headerlink" title="编译OpenSSL"></a>编译OpenSSL</h3><ol><li>下载<code>openssl-1.0.1e.tar.gz</code>并解压。</li><li><p>在<code>\include\openssl\x509v3.h</code>里添加：</p> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br><span class="line">5</span><br><span class="line">6</span><br></pre></td><td class="code"><pre><span class="line">#ifdef OPENSSL_SYS_WIN32</span><br><span class="line">    /* Under Win32 these are defined in wincrypt.h */  </span><br><span class="line">#undef X509_NAME</span><br><span class="line">#undef X509_CERT_PAIR</span><br><span class="line">#undef X509_EXTENSIONS</span><br><span class="line">#endif</span><br></pre></td></tr></table></figure></li><li><p>安装ActivePerl</p></li><li><p>打开VS命令提示行，进入OpenSSL路径，依次输入以下命令：</p> <figure class="highlight plain"><table><tr><td class="gutter"><pre><span class="line">1</span><br><span class="line">2</span><br><span class="line">3</span><br><span class="line">4</span><br></pre></td><td class="code"><pre><span class="line">perl Configure VC-WIN32 no-asm --prefix= C:\dev\OpenSSL</span><br><span class="line">ms\do_ms</span><br><span class="line">nmake -f ms\ntdll.mak</span><br><span class="line">nmake -f ms\ntdll.mak install</span><br></pre></td></tr></table></figure></li></ol><h3 id="编译WPA-Supplicant"><a href="#编译WPA-Supplicant" class="headerlink" title="编译WPA Supplicant"></a>编译WPA Supplicant</h3><ol><li>下载<code>wpa_supplicant-0.7.3.tar.gz</code>并解压。</li><li>用VS2008打开<code>vs2005\wpa_supplicant.sln</code>，编译即可。</li></ol><h3 id="问题与解决"><a href="#问题与解决" class="headerlink" title="问题与解决"></a>问题与解决</h3><ol><li>OpenSSL的宏定义和VS的<code>wincrypt.h</code>的宏定义冲突，需要按上述方法取消宏定义。</li><li>wpa_supplicant-2.0在Windows下编译有很多问题，用0.7.3版可以编译。</li><li>VS2005在编译时会提示“调试信息损坏,请重新编译模块”，经查询是<a href="http://support.microsoft.com/kb/974193/zh-cn" target="_blank" rel="noopener">VS2005自身的bug</a>，改用VS2008可编译。</li></ol>]]></content>
+    
+    <summary type="html">
+    
+      
+      
+        &lt;h3 id=&quot;下载WinPcap&quot;&gt;&lt;a href=&quot;#下载WinPcap&quot; class=&quot;headerlink&quot; title=&quot;下载WinPcap&quot;&gt;&lt;/a&gt;下载WinPcap&lt;/h3&gt;&lt;p&gt;下载&lt;code&gt;WpdPack_4_0_2.zip&lt;/code&gt;，解压到&lt;code&gt;
+      
+    
+    </summary>
+    
+    
+      <category term="工作" scheme="http://atomicink.github.io/tags/%E5%B7%A5%E4%BD%9C/"/>
+    
+  </entry>
+  
+</feed>
